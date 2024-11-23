@@ -5,10 +5,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { StrictMode } from "react";
+import { getFirestore } from "firebase/firestore";
 import { createRoot } from "react-dom/client";
 import App from "./app.tsx";
 import { AuthContextProvider } from "./auth-context.tsx";
+import { DbContext } from "./db-context.tsx";
 import "./index.css";
 
 const firebaseConfig = {
@@ -24,6 +25,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 getAnalytics(app);
 const auth = getAuth();
+const db = getFirestore(app);
 
 const darkTheme = createTheme({
   palette: {
@@ -32,14 +34,14 @@ const darkTheme = createTheme({
 });
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ThemeProvider theme={darkTheme}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <CssBaseline />
-        <AuthContextProvider auth={auth}>
+  <ThemeProvider theme={darkTheme}>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <CssBaseline />
+      <AuthContextProvider auth={auth}>
+        <DbContext.Provider value={db}>
           <App />
-        </AuthContextProvider>
-      </LocalizationProvider>
-    </ThemeProvider>
-  </StrictMode>
+        </DbContext.Provider>
+      </AuthContextProvider>
+    </LocalizationProvider>
+  </ThemeProvider>
 );

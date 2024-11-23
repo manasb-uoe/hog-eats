@@ -3,6 +3,7 @@ import Favorite from "@mui/icons-material/Favorite";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import {
   Alert,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -16,24 +17,11 @@ import TextField from "@mui/material/TextField";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { useAuthContext } from "./auth-context";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
+import { useGetRestaurants, useSetRestaurants } from "./api";
 import commonCuisines from "./common-cuisines.json";
-
-interface IRestaurant {
-  id: string;
-  name: string;
-  cuisine: string;
-  notes?: string;
-  dateVisited?: Date;
-  isFavorite?: boolean;
-}
+import { IRestaurant } from "./types";
+import { useEffectAfterMount } from "./use-effect-after-mount";
 
 const colDefs: GridColDef[] = [
   { field: "name", headerName: "Name", width: 200 },
@@ -48,7 +36,7 @@ const colDefs: GridColDef[] = [
     field: "dateVisited",
     headerName: "Date Visited",
     width: 200,
-    valueFormatter: (value: Date) => dayjs(value).format("MMMM YYYY"),
+    valueFormatter: (value: number) => dayjs.unix(value).format("MMMM YYYY"),
   },
 ];
 
@@ -109,7 +97,7 @@ const RestaurantDialog = ({
         id: crypto.randomUUID(),
         name,
         cuisine,
-        dateVisited: dateVisited?.toDate(),
+        dateVisited: dateVisited?.unix(),
         isFavorite: isFav,
         notes,
       };
@@ -119,7 +107,7 @@ const RestaurantDialog = ({
         ...selectedRestaurant,
         name,
         cuisine,
-        dateVisited: dateVisited?.toDate(),
+        dateVisited: dateVisited?.unix(),
         isFavorite: isFav,
         notes,
       });
@@ -210,32 +198,30 @@ const RestaurantDialog = ({
   );
 };
 
-function App() {
+const AppContent = ({
+  restaurants: restaurantsInitiallyLoadedFromDb,
+}: {
+  restaurants: IRestaurant[];
+}) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+  const setRestaurantsMutation = useSetRestaurants();
 
-  const { user } = useAuthContext();
-
-  const [restaurants, setRestaurants] = useState<IRestaurant[]>(() => {
-    const restored = localStorage.getItem(user.uid);
-    if (!restored) return [];
-    const parsed: any[] = JSON.parse(restored);
-    return parsed.map((p) => ({
-      ...p,
-      dateVisited: new Date(p.dateVisited),
-    })) as IRestaurant[];
-  });
-
+  const [restaurants, setRestaurants] = useState<IRestaurant[]>(
+    restaurantsInitiallyLoadedFromDb
+  );
   const [selectedRestaurant, setSelectedRestaurant] = useState<IRestaurant>();
 
   const onRestaurantAdded = useCallback((restaurant: IRestaurant) => {
-    setRestaurants((prev) => [...prev, restaurant]);
+    setRestaurants((prev) => {
+      return [...prev, restaurant];
+    });
   }, []);
 
   const onRestaurantChanged = useCallback((restaurant: IRestaurant) => {
     setRestaurants((prev) => {
-      const cloned = [...prev];
+      const cloned = [...(prev ?? [])];
       const index = cloned.findIndex((r) => r.id === restaurant.id);
       cloned.splice(index, 1, restaurant);
       return cloned;
@@ -243,6 +229,7 @@ function App() {
   }, []);
 
   const filteredRestaurants = useMemo(() => {
+    if (!restaurants) return [];
     if (!query.length) return [...restaurants];
 
     return restaurants.filter((r) => {
@@ -255,8 +242,8 @@ function App() {
     });
   }, [deferredQuery, restaurants]);
 
-  useEffect(() => {
-    localStorage.setItem(user?.uid!, JSON.stringify(restaurants));
+  useEffectAfterMount(() => {
+    setRestaurantsMutation.set(restaurants);
   }, [restaurants]);
 
   return (
@@ -292,6 +279,20 @@ function App() {
       )}
     </div>
   );
-}
+};
+
+const App = () => {
+  const getRestaurantsQuery = useGetRestaurants();
+
+  if (getRestaurantsQuery.loading) {
+    return <CircularProgress />;
+  }
+
+  if (getRestaurantsQuery.error) {
+    return <Alert severity="error">{getRestaurantsQuery.error.message}</Alert>;
+  }
+
+  return <AppContent restaurants={getRestaurantsQuery.data!} />;
+};
 
 export default App;
