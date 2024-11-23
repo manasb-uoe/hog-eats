@@ -29,14 +29,11 @@ export const AuthContextProvider = ({
     });
 
     onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        setError(new Error("Auth state changed but no user found"));
-      } else {
+      if (user) {
         console.log("User logged in:", user.uid);
         setUser(user);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
   }, []);
 
