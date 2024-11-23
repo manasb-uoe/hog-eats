@@ -10,6 +10,7 @@ import {
   IconButton,
   ToggleButton,
 } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -23,6 +24,7 @@ import {
   useState,
 } from "react";
 import { useAuthContext } from "./auth-context";
+import commonCuisines from "./common-cuisines.json";
 
 interface IRestaurant {
   id: string;
@@ -160,13 +162,16 @@ const RestaurantDialog = ({
             fullWidth
             onChange={(e) => setName(e.target.value)}
           />
-          <TextField
-            onChange={(e) => setCuisine(e.target.value)}
-            size="small"
-            label="Cuisine"
-            required
+          <Autocomplete
+            disablePortal
+            autoHighlight
+            autoSelect
+            options={commonCuisines}
             value={cuisine}
-            fullWidth
+            ListboxProps={{ style: { maxHeight: 150 } }}
+            freeSolo
+            onChange={(_, newValue) => setCuisine(newValue ?? "")}
+            renderInput={(params) => <TextField {...params} label="Cuisine" />}
           />
           <DatePicker
             views={["year", "month"]}
@@ -236,8 +241,6 @@ function App() {
       return cloned;
     });
   }, []);
-
-  console.log(restaurants);
 
   const filteredRestaurants = useMemo(() => {
     if (!query.length) return [...restaurants];
