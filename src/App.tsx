@@ -24,20 +24,26 @@ import { IRestaurant } from "./types";
 import { useEffectAfterMount } from "./use-effect-after-mount";
 
 const colDefs: GridColDef[] = [
-  { field: "name", headerName: "Name", width: 200 },
-  { field: "cuisine", headerName: "Cuisine", width: 200 },
+  { field: "name", headerName: "Name", width: 200, flex: 1 },
+  { field: "cuisine", headerName: "Cuisine", width: 200, flex: 1 },
   {
     field: "isFavorite",
     headerName: "Favorite",
     width: 200,
-    valueFormatter: (value: boolean) => (value ? "Yes" : "No"),
+    renderCell: (params) =>
+      params.value ? (
+        <Favorite fontSize="small" />
+      ) : (
+        <FavoriteBorder fontSize="small" />
+      ),
+    flex: 1,
   },
-  {
-    field: "dateVisited",
-    headerName: "Date Visited",
-    width: 200,
-    valueFormatter: (value: number) => dayjs.unix(value).format("MMMM YYYY"),
-  },
+  // {
+  //   field: "dateVisited",
+  //   headerName: "Date Visited",
+  //   width: 200,
+  //   valueFormatter: (value: number) => dayjs.unix(value).format("MMMM YYYY"),
+  // },
 ];
 
 const GridToolbar = ({
@@ -84,7 +90,7 @@ const RestaurantDialog = ({
   const [name, setName] = useState(selectedRestaurant?.name ?? "");
   const [cuisine, setCuisine] = useState(selectedRestaurant?.cuisine ?? "");
   const [dateVisited, setDateVisited] = useState<Dayjs | undefined>(
-    dayjs(selectedRestaurant?.dateVisited ?? new Date())
+    dayjs.unix(selectedRestaurant?.dateVisited ?? Date.now())
   );
   const [notes, setNotes] = useState(selectedRestaurant?.notes ?? "");
   const [isFav, setIsFav] = useState(selectedRestaurant?.isFavorite ?? false);
@@ -247,7 +253,7 @@ const AppContent = ({
   }, [restaurants]);
 
   return (
-    <div className="flex flex-col flex-grow">
+    <div className="flex flex-col flex-grow h-screen">
       <GridToolbar
         queryDisabled={!!!restaurants.length}
         onQueryChanged={setQuery}
@@ -259,6 +265,7 @@ const AppContent = ({
             setSelectedRestaurant(params.row);
             setIsDialogOpen(true);
           }}
+          density="compact"
           rows={filteredRestaurants}
           columns={colDefs}
           disableRowSelectionOnClick={true}
