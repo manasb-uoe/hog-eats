@@ -29,7 +29,7 @@ const db = getFirestore(app);
 
 const darkTheme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
   },
 });
 

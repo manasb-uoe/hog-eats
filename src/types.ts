@@ -1,8 +1,10 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface IRestaurant {
   id: string;
   name: string;
   cuisine: string;
   notes?: string;
-  dateVisited?: number;
+  createdAt?: Timestamp;
   isFavorite?: boolean;
 }

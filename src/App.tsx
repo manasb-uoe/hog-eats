@@ -1,52 +1,23 @@
-import CloseIcon from "@mui/icons-material/Close";
-import Favorite from "@mui/icons-material/Favorite";
-import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
+import AddIcon from "@mui/icons-material/Add";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
 import {
   Alert,
+  AppBar,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  ToggleButton,
+  Container,
+  Toolbar,
+  Typography,
 } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs, { Dayjs } from "dayjs";
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useGetRestaurants, useSetRestaurants } from "./api";
-import commonCuisines from "./common-cuisines.json";
+import { RestaurantDialog } from "./restaurant-dialog";
+import { RestaurantsList } from "./restaurants-list";
 import { IRestaurant } from "./types";
 import { useEffectAfterMount } from "./use-effect-after-mount";
 
-const colDefs: GridColDef[] = [
-  { field: "name", headerName: "Name", width: 200, flex: 1 },
-  { field: "cuisine", headerName: "Cuisine", width: 200, flex: 1 },
-  {
-    field: "isFavorite",
-    headerName: "Favorite",
-    width: 200,
-    renderCell: (params) =>
-      params.value ? (
-        <Favorite fontSize="small" />
-      ) : (
-        <FavoriteBorder fontSize="small" />
-      ),
-    flex: 1,
-  },
-  // {
-  //   field: "dateVisited",
-  //   headerName: "Date Visited",
-  //   width: 200,
-  //   valueFormatter: (value: number) => dayjs.unix(value).format("MMMM YYYY"),
-  // },
-];
-
-const GridToolbar = ({
+const SearchToolbar = ({
   onQueryChanged,
   initialQuery,
   queryDisabled,
@@ -58,149 +29,26 @@ const GridToolbar = ({
   openDialog: () => void;
 }) => {
   return (
-    <div className="flex flex-row gap-2 p-2">
+    <div className="flex flex-row gap-2 mb-2">
       <TextField
         disabled={queryDisabled}
-        className="w-64"
+        className="flex-grow"
         onChange={(e) => onQueryChanged(e.target.value)}
         size="small"
-        label="Search"
+        placeholder="Search"
         variant="outlined"
         value={initialQuery}
       />
-      <Button size="small" variant="contained" onClick={openDialog}>
+      <Button
+        classes={{ startIcon: "!mr-1" }}
+        startIcon={<AddIcon fontSize="small" />}
+        size="small"
+        variant="contained"
+        onClick={openDialog}
+      >
         Add
       </Button>
     </div>
-  );
-};
-
-const RestaurantDialog = ({
-  onRestaurantAdded,
-  onRestaurantChanged,
-  closeDialog,
-  selectedRestaurant,
-}: {
-  onRestaurantAdded: (restaurant: IRestaurant) => void;
-  onRestaurantChanged: (restaurant: IRestaurant) => void;
-  closeDialog: () => void;
-  selectedRestaurant?: IRestaurant;
-}) => {
-  const inAddMode = !!!selectedRestaurant;
-  const [name, setName] = useState(selectedRestaurant?.name ?? "");
-  const [cuisine, setCuisine] = useState(selectedRestaurant?.cuisine ?? "");
-  const [dateVisited, setDateVisited] = useState<Dayjs | undefined>(
-    dayjs.unix(selectedRestaurant?.dateVisited ?? Date.now())
-  );
-  const [notes, setNotes] = useState(selectedRestaurant?.notes ?? "");
-  const [isFav, setIsFav] = useState(selectedRestaurant?.isFavorite ?? false);
-
-  const canSave = name?.length && cuisine?.length;
-
-  const handleSave = useCallback(() => {
-    if (inAddMode) {
-      const restaurant: IRestaurant = {
-        id: crypto.randomUUID(),
-        name,
-        cuisine,
-        dateVisited: dateVisited?.unix(),
-        isFavorite: isFav,
-        notes,
-      };
-      onRestaurantAdded(restaurant);
-    } else {
-      onRestaurantChanged({
-        ...selectedRestaurant,
-        name,
-        cuisine,
-        dateVisited: dateVisited?.unix(),
-        isFavorite: isFav,
-        notes,
-      });
-    }
-    closeDialog();
-  }, [
-    name,
-    cuisine,
-    notes,
-    dateVisited,
-    isFav,
-    onRestaurantAdded,
-    onRestaurantChanged,
-    closeDialog,
-    inAddMode,
-  ]);
-  return (
-    <Dialog onClose={closeDialog} open={true} fullWidth>
-      <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-        {inAddMode ? "Add new restaurant" : selectedRestaurant.name}
-      </DialogTitle>
-      <IconButton
-        onClick={closeDialog}
-        sx={(theme) => ({
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: theme.palette.grey[500],
-        })}
-      >
-        <CloseIcon />
-      </IconButton>
-      <DialogContent>
-        <div className="flex flex-col gap-3">
-          <TextField
-            size="small"
-            label="Name"
-            required
-            value={name}
-            fullWidth
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Autocomplete
-            disablePortal
-            autoHighlight
-            autoSelect
-            options={commonCuisines}
-            value={cuisine}
-            ListboxProps={{ style: { maxHeight: 150 } }}
-            freeSolo
-            onChange={(_, newValue) => setCuisine(newValue ?? "")}
-            renderInput={(params) => <TextField {...params} label="Cuisine" />}
-          />
-          <DatePicker
-            views={["year", "month"]}
-            label="Date Visited"
-            value={dateVisited}
-            onChange={(d) => setDateVisited(d ?? undefined)}
-          />
-          <TextField
-            size="small"
-            multiline
-            value={notes}
-            rows={5}
-            label="Notes"
-            onChange={(e) => setNotes(e.target.value)}
-            fullWidth
-          />
-          <ToggleButton
-            value={isFav}
-            selected={isFav}
-            className="w-32"
-            onChange={() => setIsFav((prev) => !prev)}
-          >
-            <span className="pr-1">
-              {isFav ? <Favorite /> : <FavoriteBorder />}
-            </span>
-            Favorite
-          </ToggleButton>
-        </div>
-      </DialogContent>
-      <DialogActions>
-        <Button disabled={!canSave} autoFocus onClick={handleSave}>
-          {inAddMode ? "Add" : "Save"}
-        </Button>
-      </DialogActions>
-    </Dialog>
   );
 };
 
@@ -252,36 +100,40 @@ const AppContent = ({
     setRestaurantsMutation.set(restaurants);
   }, [restaurants]);
 
+  const onRestaurantSelected = useCallback((restaurant: IRestaurant) => {
+    setSelectedRestaurant(restaurant);
+    setIsDialogOpen(true);
+  }, []);
+
   return (
-    <div className="flex flex-col flex-grow h-screen">
-      <GridToolbar
+    <div className="flex flex-col flex-grow px-4">
+      <SearchToolbar
+        onQueryChanged={(value) => setQuery(value)}
+        initialQuery={query}
+        openDialog={() => {
+          setSelectedRestaurant(undefined);
+          setIsDialogOpen(true);
+        }}
         queryDisabled={!!!restaurants.length}
-        onQueryChanged={setQuery}
-        openDialog={() => setIsDialogOpen(true)}
       />
+
       {restaurants.length ? (
-        <DataGrid
-          onRowClick={(params) => {
-            setSelectedRestaurant(params.row);
-            setIsDialogOpen(true);
-          }}
-          density="compact"
-          rows={filteredRestaurants}
-          columns={colDefs}
-          disableRowSelectionOnClick={true}
-          disableMultipleRowSelection={true}
+        <RestaurantsList
+          restaurants={filteredRestaurants}
+          onRestaurantSelected={onRestaurantSelected}
         />
       ) : (
         <Alert severity="info">
           There are no restaurants in your list. Start by clicking Add above.
         </Alert>
       )}
+
       {isDialogOpen && (
         <RestaurantDialog
           closeDialog={() => setIsDialogOpen(false)}
+          selectedRestaurant={selectedRestaurant}
           onRestaurantAdded={onRestaurantAdded}
           onRestaurantChanged={onRestaurantChanged}
-          selectedRestaurant={selectedRestaurant}
         />
       )}
     </div>
@@ -302,4 +154,22 @@ const App = () => {
   return <AppContent restaurants={getRestaurantsQuery.data!} />;
 };
 
-export default App;
+const AppWrapper = () => {
+  return (
+    <div className="flex flex-col h-screen gap-2 bg-gray-100">
+      <AppBar position="sticky">
+        <Container maxWidth="xl">
+          <Toolbar disableGutters variant="dense">
+            <RestaurantIcon className="pr-2" />
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Favourite Restaurants
+            </Typography>
+          </Toolbar>
+        </Container>
+      </AppBar>
+      <App />
+    </div>
+  );
+};
+
+export default AppWrapper;

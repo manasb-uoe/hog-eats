@@ -1,8 +1,10 @@
 import { Alert, CircularProgress } from "@mui/material";
 import {
   Auth,
+  browserLocalPersistence,
   onAuthStateChanged,
-  signInAnonymously,
+  setPersistence,
+  signInWithEmailAndPassword,
   User,
   UserInfo,
 } from "firebase/auth";
@@ -24,9 +26,18 @@ export const AuthContextProvider = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    signInAnonymously(auth).catch((error) => {
-      setError(new Error(error.message));
-    });
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        return signInWithEmailAndPassword(
+          auth,
+          "manas.bajaj94@gmail.com",
+          "123456"
+        );
+      })
+      .catch((error) => {
+        setError(error);
+        setLoading(false);
+      });
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -38,7 +49,11 @@ export const AuthContextProvider = ({
   }, []);
 
   if (loading) {
-    return <CircularProgress />;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <CircularProgress />
+      </div>
+    );
   }
 
   if (error) {
