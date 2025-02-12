@@ -1,0 +1,17 @@
+{
+  "name": "Favourite Restaurants",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "short_name": "Favourite Restaurants",
+  "id": "Favourite Restaurants",
+  "display": "standalone",
+  "start_url": "https://restaurant-list-vite.web.app",
+  "icons": [
+    {
+      "src": "https://restaurant-list-vite.web.app/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
