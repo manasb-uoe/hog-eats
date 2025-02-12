@@ -39,7 +39,7 @@ createRoot(document.getElementById("root")!).render(
       <CssBaseline />
       <AuthContextProvider auth={auth}>
         <DbContext.Provider value={db}>
-          <App auth={auth} />
+          <App />
         </DbContext.Provider>
       </AuthContextProvider>
     </LocalizationProvider>
