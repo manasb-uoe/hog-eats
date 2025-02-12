@@ -1,16 +1,17 @@
-import { Alert, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import {
   Auth,
   browserLocalPersistence,
   onAuthStateChanged,
   setPersistence,
-  signInWithEmailAndPassword,
+  signOut,
   User,
   UserInfo,
 } from "firebase/auth";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { Login } from "./login";
 
-type IAuthContext = { user: UserInfo };
+type IAuthContext = { user: UserInfo; logout: () => Promise<void> };
 const AuthContext = React.createContext<IAuthContext>({} as IAuthContext);
 
 export const useAuthContext = () => {
@@ -21,31 +22,31 @@ export const AuthContextProvider = ({
   auth,
   children,
 }: React.PropsWithChildren<{ auth: Auth }>) => {
-  const [error, setError] = useState<Error | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
-    setPersistence(auth, browserLocalPersistence)
-      .then(() => {
-        return signInWithEmailAndPassword(
-          auth,
-          "manas.bajaj94@gmail.com",
-          "123456"
-        );
-      })
-      .catch((error) => {
-        setError(error);
-        setLoading(false);
-      });
-
+    setPersistence(auth, browserLocalPersistence);
     onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log("User logged in:", user.uid);
         setUser(user);
         setLoading(false);
+      } else {
+        setShowLogin(true);
+        setLoading(false);
       }
     });
+  }, []);
+
+  const logout = useCallback(async () => {
+    return await signOut(auth);
+  }, []);
+
+  const onLoginSuccess = useCallback((user: User) => {
+    setUser(user);
+    setShowLogin(false);
   }, []);
 
   if (loading) {
@@ -56,12 +57,12 @@ export const AuthContextProvider = ({
     );
   }
 
-  if (error) {
-    return <Alert severity="error">{error.message}</Alert>;
+  if (showLogin) {
+    return <Login auth={auth} onSuccess={onLoginSuccess} />;
   }
 
   return (
-    <AuthContext.Provider value={{ user: user! }}>
+    <AuthContext.Provider value={{ user: user!, logout }}>
       {children}
     </AuthContext.Provider>
   );

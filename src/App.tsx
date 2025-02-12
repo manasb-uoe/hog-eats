@@ -12,6 +12,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useGetRestaurants, useSetRestaurants } from "./api";
+import { useAuthContext } from "./auth-context";
 import { RestaurantDialog } from "./restaurant-dialog";
 import { RestaurantsList } from "./restaurants-list";
 import { IRestaurant } from "./types";
@@ -155,6 +156,8 @@ const App = () => {
 };
 
 const AppWrapper = () => {
+  const authContext = useAuthContext();
+
   return (
     <div className="flex flex-col h-screen gap-2 bg-gray-100">
       <AppBar position="sticky">
@@ -164,6 +167,9 @@ const AppWrapper = () => {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Favourite Restaurants
             </Typography>
+            <Button onClick={authContext.logout} color="inherit" size="small">
+              Logout
+            </Button>
           </Toolbar>
         </Container>
       </AppBar>

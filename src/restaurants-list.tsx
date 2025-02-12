@@ -44,11 +44,13 @@ export const RestaurantsList = ({
             title={item.name}
             subheader={item.cuisine}
           />
-          <CardContent>
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              {item.notes}
-            </Typography>
-          </CardContent>
+          {!!item.notes?.length && (
+            <CardContent>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                {item.notes}
+              </Typography>
+            </CardContent>
+          )}
           <CardActions>
             <Button size="small" onClick={() => onRestaurantSelected(item)}>
               Edit
