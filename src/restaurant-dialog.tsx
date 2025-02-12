@@ -142,6 +142,7 @@ export const RestaurantDialog = ({
           disabled={!canSave}
           autoFocus
           onClick={handleSave}
+          fullWidth
         >
           {inAddMode ? "Add" : "Save"}
         </Button>
