@@ -22,7 +22,7 @@ export const RestaurantsList = ({
   const guideLookup = useCallback((restaurant: IRestaurant) => {
     window.open(
       `https://guide.michelin.com/en/restaurants?q=${encodeURIComponent(
-        `${restaurant.name} ${restaurant.cuisine}`
+        restaurant.name
       )}`
     );
   }, []);
