@@ -136,7 +136,13 @@ export const RestaurantDialog = ({
         </div>
       </DialogContent>
       <DialogActions>
-        <Button size="small" disabled={!canSave} autoFocus onClick={handleSave}>
+        <Button
+          variant="contained"
+          size="small"
+          disabled={!canSave}
+          autoFocus
+          onClick={handleSave}
+        >
           {inAddMode ? "Add" : "Save"}
         </Button>
       </DialogActions>
