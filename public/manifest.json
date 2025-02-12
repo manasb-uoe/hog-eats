@@ -1,8 +1,8 @@
 {
-  "name": "Favourite Restaurants",
+  "name": "Hog Eats",
   "theme_color": "#000000",
   "background_color": "#000000",
-  "short_name": "Favourite Restaurants",
+  "short_name": "Hog Eats",
   "id": "Favourite Restaurants",
   "display": "standalone",
   "start_url": "https://restaurant-list-vite.web.app",
