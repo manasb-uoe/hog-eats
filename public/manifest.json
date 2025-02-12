@@ -3,7 +3,7 @@
   "theme_color": "#000000",
   "background_color": "#000000",
   "short_name": "Hog Eats",
-  "id": "Favourite Restaurants",
+  "id": "hog-eats",
   "display": "standalone",
   "start_url": "https://restaurant-list-vite.web.app",
   "icons": [

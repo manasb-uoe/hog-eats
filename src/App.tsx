@@ -1,5 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
+import SavingsIcon from "@mui/icons-material/Savings";
 import {
   Alert,
   AppBar,
@@ -129,14 +129,14 @@ const AppContent = ({
         </Alert>
       )}
 
-      {isDialogOpen && (
-        <RestaurantDialog
-          closeDialog={() => setIsDialogOpen(false)}
-          selectedRestaurant={selectedRestaurant}
-          onRestaurantAdded={onRestaurantAdded}
-          onRestaurantChanged={onRestaurantChanged}
-        />
-      )}
+      <RestaurantDialog
+        key={selectedRestaurant?.id}
+        open={isDialogOpen}
+        closeDialog={() => setIsDialogOpen(false)}
+        selectedRestaurant={selectedRestaurant}
+        onRestaurantAdded={onRestaurantAdded}
+        onRestaurantChanged={onRestaurantChanged}
+      />
     </div>
   );
 };
@@ -163,9 +163,9 @@ const AppWrapper = () => {
       <AppBar position="sticky">
         <Container maxWidth="xl">
           <Toolbar disableGutters variant="dense">
-            <RestaurantIcon className="pr-2" />
+            <SavingsIcon className="pr-2" />
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Favourite Restaurants
+              Hog Eats
             </Typography>
             <Button onClick={authContext.logout} color="inherit" size="small">
               Logout

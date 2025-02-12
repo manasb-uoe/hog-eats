@@ -2,27 +2,41 @@ import CloseIcon from "@mui/icons-material/Close";
 import Favorite from "@mui/icons-material/Favorite";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import {
+  AppBar,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogTitle,
   IconButton,
+  Slide,
   ToggleButton,
+  Toolbar,
+  Typography,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import { TransitionProps } from "@mui/material/transitions";
 import { Timestamp } from "firebase/firestore";
-import { useCallback, useState } from "react";
+import { forwardRef, useCallback, useState } from "react";
 import commonCuisines from "./common-cuisines.json";
 import { IRestaurant } from "./types";
 
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 export const RestaurantDialog = ({
+  open,
   onRestaurantAdded,
   onRestaurantChanged,
   closeDialog,
   selectedRestaurant,
 }: {
+  open: boolean;
   onRestaurantAdded: (restaurant: IRestaurant) => void;
   onRestaurantChanged: (restaurant: IRestaurant) => void;
   closeDialog: () => void;
@@ -68,10 +82,36 @@ export const RestaurantDialog = ({
     inAddMode,
   ]);
   return (
-    <Dialog fullScreen onClose={closeDialog} open={true} fullWidth>
-      <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-        {inAddMode ? "Add new restaurant" : selectedRestaurant.name}
-      </DialogTitle>
+    <Dialog
+      fullScreen
+      onClose={closeDialog}
+      open={open}
+      fullWidth
+      TransitionComponent={Transition}
+    >
+      <AppBar sx={{ position: "relative" }}>
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={closeDialog}
+            aria-label="close"
+          >
+            <CloseIcon />
+          </IconButton>
+          <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+            {inAddMode ? "Add new restaurant" : selectedRestaurant.name}
+          </Typography>
+          <Button
+            disabled={!canSave}
+            autoFocus
+            color="inherit"
+            onClick={handleSave}
+          >
+            {inAddMode ? "Add" : "Save"}
+          </Button>
+        </Toolbar>
+      </AppBar>
       <IconButton
         onClick={closeDialog}
         sx={(theme) => ({
@@ -135,18 +175,6 @@ export const RestaurantDialog = ({
           </ToggleButton>
         </div>
       </DialogContent>
-      <DialogActions>
-        <Button
-          variant="contained"
-          size="small"
-          disabled={!canSave}
-          autoFocus
-          onClick={handleSave}
-          fullWidth
-        >
-          {inAddMode ? "Add" : "Save"}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };
