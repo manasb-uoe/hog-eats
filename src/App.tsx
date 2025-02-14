@@ -30,7 +30,7 @@ const SearchToolbar = ({
   openDialog: () => void;
 }) => {
   return (
-    <div className="flex flex-row gap-2 mb-2">
+    <div className="flex flex-row gap-2 mb-2 px-4">
       <TextField
         disabled={queryDisabled}
         className="flex-grow"
@@ -107,7 +107,7 @@ const AppContent = ({
   }, []);
 
   return (
-    <div className="flex flex-col flex-grow px-4">
+    <div className="flex flex-col flex-grow overflow-y-hidden">
       <SearchToolbar
         onQueryChanged={(value) => setQuery(value)}
         initialQuery={query}

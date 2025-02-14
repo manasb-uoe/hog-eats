@@ -32,7 +32,7 @@ export const RestaurantsList = ({
   }
 
   return (
-    <List dense={true}>
+    <List dense={true} className="overflow-y-scroll !px-4">
       {restaurants.map((item) => (
         <Card key={item.id} className="mb-2">
           <CardHeader
