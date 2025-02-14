@@ -28,7 +28,7 @@ export const RestaurantsList = ({
   }, []);
 
   if (!restaurants.length) {
-    return <Typography>No restaurants found</Typography>;
+    return <Typography className="px-4">No restaurants found</Typography>;
   }
 
   return (

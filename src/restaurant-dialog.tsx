@@ -33,12 +33,14 @@ export const RestaurantDialog = ({
   open,
   onRestaurantAdded,
   onRestaurantChanged,
+  onRestaurantDeleted,
   closeDialog,
   selectedRestaurant,
 }: {
   open: boolean;
   onRestaurantAdded: (restaurant: IRestaurant) => void;
   onRestaurantChanged: (restaurant: IRestaurant) => void;
+  onRestaurantDeleted: (deleted: IRestaurant) => void;
   closeDialog: () => void;
   selectedRestaurant?: IRestaurant;
 }) => {
@@ -157,22 +159,33 @@ export const RestaurantDialog = ({
             onChange={(e) => setNotes(e.target.value)}
             fullWidth
           />
-          <ToggleButton
-            value={isFav}
-            size="small"
-            selected={isFav}
-            className="w-32"
-            onChange={() => setIsFav((prev) => !prev)}
-          >
-            <span className="pr-1">
-              {isFav ? (
-                <Favorite fontSize="small" />
-              ) : (
-                <FavoriteBorder fontSize="small" />
-              )}
-            </span>
-            Favorite
-          </ToggleButton>
+          <div className="flex gap-2">
+            <ToggleButton
+              value={isFav}
+              size="small"
+              selected={isFav}
+              className="w-32"
+              onChange={() => setIsFav((prev) => !prev)}
+            >
+              <span className="pr-1">
+                {isFav ? (
+                  <Favorite fontSize="small" />
+                ) : (
+                  <FavoriteBorder fontSize="small" />
+                )}
+              </span>
+              Favorite
+            </ToggleButton>
+            {!!selectedRestaurant && (
+              <Button
+                onClick={() => onRestaurantDeleted(selectedRestaurant)}
+                variant="outlined"
+                color="error"
+              >
+                Delete
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

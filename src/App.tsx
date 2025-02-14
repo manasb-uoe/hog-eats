@@ -5,10 +5,13 @@ import {
   AppBar,
   CircularProgress,
   Container,
+  MenuItem,
+  Select,
   Toolbar,
   Typography,
 } from "@mui/material";
 import Button from "@mui/material/Button";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import TextField from "@mui/material/TextField";
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useGetRestaurants, useSetRestaurants } from "./api";
@@ -18,19 +21,46 @@ import { RestaurantsList } from "./restaurants-list";
 import { IRestaurant } from "./types";
 import { useEffectAfterMount } from "./use-effect-after-mount";
 
+type TSortMode = "Name" | "Recent";
+
 const SearchToolbar = ({
   onQueryChanged,
   initialQuery,
   queryDisabled,
   openDialog,
+  sortMode,
+  onSortModeChanged,
 }: {
   queryDisabled?: boolean;
   initialQuery?: string;
   onQueryChanged: (query: string) => void;
   openDialog: () => void;
+  sortMode: TSortMode;
+  onSortModeChanged: (mode: TSortMode) => void;
 }) => {
   return (
     <div className="flex flex-row gap-2 mb-2 px-4">
+      <Select
+        size="small"
+        margin="dense"
+        displayEmpty
+        onChange={(e) => onSortModeChanged(e.target.value as TSortMode)}
+        value={sortMode}
+        input={<OutlinedInput />}
+        renderValue={(selected: string) => {
+          if (selected?.length === 0) {
+            return <em>Placeholder</em>;
+          }
+
+          return selected;
+        }}
+      >
+        <MenuItem disabled value="">
+          <em>Sort by</em>
+        </MenuItem>
+        <MenuItem value="Name">Name</MenuItem>
+        <MenuItem value="Recent">Recent</MenuItem>
+      </Select>
       <TextField
         disabled={queryDisabled}
         className="flex-grow"
@@ -60,6 +90,7 @@ const AppContent = ({
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [sortMode, setSortMode] = useState<"Name" | "Recent">("Recent");
   const deferredQuery = useDeferredValue(query);
   const setRestaurantsMutation = useSetRestaurants();
 
@@ -74,6 +105,13 @@ const AppContent = ({
     });
   }, []);
 
+  const onRestaurantDeleted = useCallback((deleted: IRestaurant) => {
+    setRestaurants((prev) => {
+      return prev.filter((item) => item.id !== deleted.id);
+    });
+    setIsDialogOpen(false);
+  }, []);
+
   const onRestaurantChanged = useCallback((restaurant: IRestaurant) => {
     setRestaurants((prev) => {
       const cloned = [...(prev ?? [])];
@@ -83,19 +121,32 @@ const AppContent = ({
     });
   }, []);
 
-  const filteredRestaurants = useMemo(() => {
-    if (!restaurants) return [];
-    if (!query.length) return [...restaurants];
+  const filteredAndSortedRestaurants = useMemo(() => {
+    const sorted = (items: IRestaurant[]) => {
+      items.sort((a, b) => {
+        if (sortMode === "Name") {
+          return a.name.localeCompare(b.name);
+        } else {
+          return b.createdAt?.toMillis() - a.createdAt?.toMillis();
+        }
+      });
+      return items;
+    };
 
-    return restaurants.filter((r) => {
-      const queryLowered = query.toLowerCase();
-      return (
-        r.name.toLowerCase().includes(queryLowered) ||
-        r.cuisine.toLowerCase().includes(queryLowered) ||
-        r.notes?.toLowerCase().includes(queryLowered)
-      );
-    });
-  }, [deferredQuery, restaurants]);
+    if (!restaurants) return [];
+    if (!query.length) return sorted([...restaurants]);
+
+    return sorted(
+      restaurants.filter((r) => {
+        const queryLowered = query.toLowerCase();
+        return (
+          r.name.toLowerCase().includes(queryLowered) ||
+          r.cuisine.toLowerCase().includes(queryLowered) ||
+          r.notes?.toLowerCase().includes(queryLowered)
+        );
+      })
+    );
+  }, [deferredQuery, restaurants, sortMode]);
 
   useEffectAfterMount(() => {
     setRestaurantsMutation.set(restaurants);
@@ -116,15 +167,17 @@ const AppContent = ({
           setIsDialogOpen(true);
         }}
         queryDisabled={!!!restaurants.length}
+        sortMode={sortMode}
+        onSortModeChanged={setSortMode}
       />
 
       {restaurants.length ? (
         <RestaurantsList
-          restaurants={filteredRestaurants}
+          restaurants={filteredAndSortedRestaurants}
           onRestaurantSelected={onRestaurantSelected}
         />
       ) : (
-        <Alert severity="info">
+        <Alert severity="info" className="mx-4">
           There are no restaurants in your list. Start by clicking Add above.
         </Alert>
       )}
@@ -136,6 +189,7 @@ const AppContent = ({
         selectedRestaurant={selectedRestaurant}
         onRestaurantAdded={onRestaurantAdded}
         onRestaurantChanged={onRestaurantChanged}
+        onRestaurantDeleted={onRestaurantDeleted}
       />
     </div>
   );

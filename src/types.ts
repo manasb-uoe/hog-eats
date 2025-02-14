@@ -4,7 +4,7 @@ export interface IRestaurant {
   id: string;
   name: string;
   cuisine: string;
-  notes?: string;
-  createdAt?: Timestamp;
+  createdAt: Timestamp;
   isFavorite?: boolean;
+  notes?: string;
 }
