@@ -21,7 +21,7 @@ import { RestaurantsList } from "./restaurants-list";
 import { IRestaurant } from "./types";
 import { useEffectAfterMount } from "./use-effect-after-mount";
 
-type TSortMode = "Name" | "Recent";
+type TSortMode = "Name" | "Recent" | "Cuisine";
 
 const SearchToolbar = ({
   onQueryChanged,
@@ -59,6 +59,7 @@ const SearchToolbar = ({
           <em>Sort by</em>
         </MenuItem>
         <MenuItem value="Name">Name</MenuItem>
+        <MenuItem value="Cuisine">Cuisine</MenuItem>
         <MenuItem value="Recent">Recent</MenuItem>
       </Select>
       <TextField
@@ -90,7 +91,7 @@ const AppContent = ({
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [sortMode, setSortMode] = useState<"Name" | "Recent">("Recent");
+  const [sortMode, setSortMode] = useState<TSortMode>("Recent");
   const deferredQuery = useDeferredValue(query);
   const setRestaurantsMutation = useSetRestaurants();
 
@@ -126,6 +127,8 @@ const AppContent = ({
       items.sort((a, b) => {
         if (sortMode === "Name") {
           return a.name.localeCompare(b.name);
+        } else if (sortMode === "Cuisine") {
+          return a.cuisine.localeCompare(b.cuisine);
         } else {
           return b.createdAt?.toMillis() - a.createdAt?.toMillis();
         }
@@ -191,6 +194,20 @@ const AppContent = ({
         onRestaurantChanged={onRestaurantChanged}
         onRestaurantDeleted={onRestaurantDeleted}
       />
+
+      <div className="bg-opacity-80 p-2 bg-white border-solid border-t-2 border-gray-100 absolute bottom-0 text-center w-full">
+        {filteredAndSortedRestaurants.length === restaurants.length ? (
+          <Typography variant="body2">
+            Showing <strong>{filteredAndSortedRestaurants.length}</strong>{" "}
+            restaurants
+          </Typography>
+        ) : (
+          <Typography variant="body2">
+            Showing <strong>{filteredAndSortedRestaurants.length}</strong> of{" "}
+            <strong>{restaurants.length}</strong> restaurants
+          </Typography>
+        )}
+      </div>
     </div>
   );
 };
