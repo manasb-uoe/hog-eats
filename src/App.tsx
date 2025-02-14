@@ -195,7 +195,7 @@ const AppContent = ({
         onRestaurantDeleted={onRestaurantDeleted}
       />
 
-      <div className="bg-opacity-80 p-2 bg-white border-solid border-t-2 border-gray-100 absolute bottom-0 text-center w-full">
+      <div className="bg-opacity-80 p-2 bg-white border-solid border-t-2 border-gray-100 absolute bottom-0 text-center w-full pb-4">
         {filteredAndSortedRestaurants.length === restaurants.length ? (
           <Typography variant="body2">
             Showing <strong>{filteredAndSortedRestaurants.length}</strong>{" "}
