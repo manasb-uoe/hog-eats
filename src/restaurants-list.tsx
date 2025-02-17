@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
   List,
+  Rating,
   Typography,
 } from "@mui/material";
 import { red } from "@mui/material/colors";
@@ -44,6 +45,9 @@ export const RestaurantsList = ({
             title={item.name}
             subheader={item.cuisine}
           />
+          {item.rating !== 0 && (
+            <Rating className="ml-4" value={item.rating} readOnly size="small" />
+          )}
           {!!item.notes?.length && (
             <CardContent>
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
