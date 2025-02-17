@@ -45,8 +45,13 @@ export const RestaurantsList = ({
             title={item.name}
             subheader={item.cuisine}
           />
-          {item.rating !== 0 && (
-            <Rating className="ml-4" value={item.rating} readOnly size="small" />
+          {item.rating !== undefined && item.rating > 0 && (
+            <Rating
+              className="ml-4"
+              value={item.rating}
+              readOnly
+              size="small"
+            />
           )}
           {!!item.notes?.length && (
             <CardContent>
