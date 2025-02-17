@@ -1,13 +1,11 @@
 import CloseIcon from "@mui/icons-material/Close";
-import Favorite from "@mui/icons-material/Favorite";
-import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import {
   AppBar,
   Dialog,
   DialogContent,
   IconButton,
+  Rating,
   Slide,
-  ToggleButton,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -48,7 +46,7 @@ export const RestaurantDialog = ({
   const [name, setName] = useState(selectedRestaurant?.name ?? "");
   const [cuisine, setCuisine] = useState(selectedRestaurant?.cuisine ?? "");
   const [notes, setNotes] = useState(selectedRestaurant?.notes ?? "");
-  const [isFav, setIsFav] = useState(selectedRestaurant?.isFavorite ?? false);
+  const [rating, setRating] = useState(selectedRestaurant?.rating ?? 0);
 
   const canSave = name?.length && cuisine?.length;
 
@@ -58,7 +56,7 @@ export const RestaurantDialog = ({
         id: crypto.randomUUID(),
         name,
         cuisine,
-        isFavorite: isFav,
+        rating,
         notes,
         createdAt: Timestamp.now(),
       };
@@ -68,7 +66,7 @@ export const RestaurantDialog = ({
         ...selectedRestaurant,
         name,
         cuisine,
-        isFavorite: isFav,
+        rating,
         notes,
       });
     }
@@ -77,7 +75,7 @@ export const RestaurantDialog = ({
     name,
     cuisine,
     notes,
-    isFav,
+    rating,
     onRestaurantAdded,
     onRestaurantChanged,
     closeDialog,
@@ -149,6 +147,7 @@ export const RestaurantDialog = ({
               <TextField margin="dense" {...params} label="Cuisine" />
             )}
           />
+
           <TextField
             size="small"
             margin="dense"
@@ -159,33 +158,34 @@ export const RestaurantDialog = ({
             onChange={(e) => setNotes(e.target.value)}
             fullWidth
           />
-          <div className="flex gap-2">
-            <ToggleButton
-              value={isFav}
-              size="small"
-              selected={isFav}
-              className="w-32"
-              onChange={() => setIsFav((prev) => !prev)}
-            >
-              <span className="pr-1">
-                {isFav ? (
-                  <Favorite fontSize="small" />
-                ) : (
-                  <FavoriteBorder fontSize="small" />
-                )}
-              </span>
-              Favorite
-            </ToggleButton>
-            {!!selectedRestaurant && (
-              <Button
-                onClick={() => onRestaurantDeleted(selectedRestaurant)}
-                variant="outlined"
-                color="error"
-              >
-                Delete
-              </Button>
-            )}
+
+          <div className="flex flex-row gap-2 items-center">
+            <Rating
+              value={rating}
+              onChange={(_, newValue) => {
+                setRating(newValue ?? 0);
+              }}
+            />
+            <Typography variant="body2">
+              {{
+                1: "Should Be Shut Down",
+                2: "Barely Edible",
+                3: "Meh",
+                4: "Decent, Might Come Back",
+                5: "Hog Certified",
+              }[rating] ?? ""}
+            </Typography>
           </div>
+
+          {!!selectedRestaurant && (
+            <Button
+              onClick={() => onRestaurantDeleted(selectedRestaurant)}
+              variant="outlined"
+              color="error"
+            >
+              Delete
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

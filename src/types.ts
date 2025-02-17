@@ -7,4 +7,5 @@ export interface IRestaurant {
   createdAt: Timestamp;
   isFavorite?: boolean;
   notes?: string;
+  rating?: number;
 }

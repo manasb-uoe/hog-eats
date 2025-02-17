@@ -21,7 +21,7 @@ import { RestaurantsList } from "./restaurants-list";
 import { IRestaurant } from "./types";
 import { useEffectAfterMount } from "./use-effect-after-mount";
 
-type TSortMode = "Name" | "Recent" | "Cuisine";
+type TSortMode = "Name" | "Recent" | "Cuisine" | "Rating";
 
 const SearchToolbar = ({
   onQueryChanged,
@@ -61,6 +61,7 @@ const SearchToolbar = ({
         <MenuItem value="Name">Name</MenuItem>
         <MenuItem value="Cuisine">Cuisine</MenuItem>
         <MenuItem value="Recent">Recent</MenuItem>
+        <MenuItem value="Rating">Rating</MenuItem>
       </Select>
       <TextField
         disabled={queryDisabled}
@@ -129,6 +130,8 @@ const AppContent = ({
           return a.name.localeCompare(b.name);
         } else if (sortMode === "Cuisine") {
           return a.cuisine.localeCompare(b.cuisine);
+        } else if (sortMode === "Rating") {
+          return (b.rating ?? 0) - (a.rating ?? 0);
         } else {
           return b.createdAt?.toMillis() - a.createdAt?.toMillis();
         }
