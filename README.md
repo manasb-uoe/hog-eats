@@ -8,7 +8,7 @@
     </a>
   </h1>
   
-A Firebase + React powered Progressive Web App (PWA) to track your favourite restaurants. Wanted to learn more about Firebase so ended up building this as part of the explorative journey.   
+A Firebase + React powered Progressive Web App (PWA) to track your favourite restaurants. Wanted to learn more about [Firebase](http://firebase.google.com/) so ended up building this as part of the explorative journey.   
 
 https://restaurant-list-vite.web.app/
 
