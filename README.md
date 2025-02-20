@@ -1,6 +1,6 @@
 <div align="center">
   <h1 align="center">
-    Docusaurus
+    Hog Eats
     <br />
     <br />
     <a href="https://restaurant-list-vite.web.app/">
