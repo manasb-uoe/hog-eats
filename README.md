@@ -13,8 +13,8 @@ A Firebase + React powered Progressive Web App (PWA) to track your favourite res
 https://restaurant-list-vite.web.app/
 
 <div style="display: flex; flex-direction: row;">
-<img src="https://github.com/manasb-uoe/hog-eats/blob/main/screenshots/screenshot-1.png?raw=true" alt="app logo" width="350"/>
-<img src="https://github.com/manasb-uoe/hog-eats/blob/main/screenshots/screenshot-2.png?raw=true" alt="app logo" width="350"/>
+<img src="https://github.com/manasb-uoe/hog-eats/blob/main/screenshots/screenshot-1.jpg?raw=true" alt="app logo" width="350"/>
+<img src="https://github.com/manasb-uoe/hog-eats/blob/main/screenshots/screenshot-2.jpg?raw=true" alt="app logo" width="350"/>
 </div>
 </div>
 
