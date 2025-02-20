@@ -13,9 +13,3 @@ A Firebase + React powered Progressive Web App (PWA) to track your favourite res
 https://restaurant-list-vite.web.app/
 </div>
 
-### Tech used
-- Vite
-- React
-- Firebase
-- Material UI
-- Tailwind
